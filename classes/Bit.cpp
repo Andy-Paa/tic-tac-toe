@@ -72,3 +72,8 @@ Player* Bit::getOwner()
 	return _owner;
 }
 
+void Bit::moveTo(const ImVec2& pos)
+{
+    setPosition(pos);
+}
+
