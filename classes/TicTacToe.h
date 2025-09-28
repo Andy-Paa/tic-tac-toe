@@ -14,9 +14,14 @@ class TicTacToe : public Game
 public:
     TicTacToe();
     ~TicTacToe();
+    //nagemax algorithm
+    int negamax(const std::string &state,int depth, int color);
 
     // set up the board
     void        setUpBoard() override;
+    //new method for simulation by using state
+    bool isDrawState(const std::string &state);
+    int checkWinnerFromState(const std::string &state);
 
     Player*     checkForWinner() override;
     bool        checkForDraw() override;

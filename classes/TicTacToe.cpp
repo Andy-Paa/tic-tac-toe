@@ -34,6 +34,54 @@ TicTacToe::TicTacToe()
 TicTacToe::~TicTacToe()
 {
 }
+//here I listed 2 new method for simulated prediction instead of using the real checking one
+int TicTacToe::checkWinnerFromState(const std::string &state) {
+    //8 ways to win
+    const int winningCombos[8][3] = {
+        {0,1,2}, {3,4,5}, {6,7,8}, //rows
+        {0,3,6}, {1,4,7}, {2,5,8}, //cols
+        {0,4,8}, {2,4,6}           //diagonals
+    };
+
+    for (int i = 0; i < 8; i++) {
+        int a = winningCombos[i][0];
+        int b = winningCombos[i][1];
+        int c = winningCombos[i][2];
+
+        if (state[a] != '0' && state[a] == state[b] && state[a] == state[c]) {
+            //translate the index
+            return (state[a] - '1'); 
+        }
+    }
+    return -1; //draw
+}
+
+bool TicTacToe::isDrawState(const std::string &state) {
+    //if '0' still exists, not draw
+    for (int i = 0; i < 9; i++) {
+        if (state[i] == '0') return false;
+    }
+    //no '0' and no winner
+    return (checkWinnerFromState(state) == -1);
+}
+
+int TicTacToe::negamax(const std::string &state, int depth, int index) {
+    int winner = checkWinnerFromState(state);
+    if (winner == AI_PLAYER) return index * 1;
+    if (winner == HUMAN_PLAYER) return index * -1;
+    if (isDrawState(state)) return 0;
+
+    int bestScore = -9999;//set a low score
+    for (int i = 0; i < 9; i++) {
+        if (state[i] == '0') {
+            std::string newState = state;
+            newState[i] = (index == 1 ? (AI_PLAYER+1+'0') : (HUMAN_PLAYER+1+'0'));
+            int score = -negamax(newState, depth+1, -index);//negate the score
+            bestScore = std::max(bestScore, score);
+        }
+    }
+    return bestScore;
+}
 
 // -----------------------------------------------------------------------------
 // make an X or an O
@@ -296,6 +344,30 @@ void TicTacToe::setStateString(const std::string &s)
 //
 void TicTacToe::updateAI() 
 {
-    // we will implement the AI in the next assignment!
-}
+    if (getCurrentPlayer()->playerNumber() != AI_PLAYER) return; //double check
 
+    std::string state = stateString();
+    int bestScore = -9999;
+    int bestMove = -1;
+
+    for (int i = 0; i < 9; i++) {
+        if (state[i] == '0') {
+            std::string newState = state;
+            //state for AI
+            newState[i] = (AI_PLAYER + 1 + '0');  
+
+            int score = -negamax(newState, 0, -1); //next turn
+            if (score > bestScore) {
+                bestScore = score;
+                bestMove = i;
+            }
+        }
+    }
+
+    //do the move
+    if (bestMove != -1) {
+        actionForEmptyHolder(&_grid[bestMove/3][bestMove%3]);
+        endTurn();
+    }
+    
+}

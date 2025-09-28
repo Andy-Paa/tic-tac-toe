@@ -3,6 +3,10 @@
 #include "BitHolder.h"
 #include "Turn.h"
 #include "../Application.h"
+#include "TicTacToe.h"
+#include <iostream>
+#include <thread>
+#include <chrono>
 
 Game::Game()
 {
@@ -92,12 +96,13 @@ void Game::endTurn()
 }
 
 void Game::scanForMouse()
-{
-    //if (gameHasAI() && getCurrentPlayer()->isAIPlayer()) 
-    //{
-    //    updateAI();
-    //    return;
-    //}
+{	
+	//std::cout << "scanForMouse: current player is " << (getCurrentPlayer()->playerNumber()) << std::endl;//for console
+    if (getCurrentPlayer()->playerNumber() == 1)
+    {
+        updateAI();//AI move
+		std::this_thread::sleep_for(std::chrono::milliseconds(600));//delay
+    }
 
     ImVec2 mousePos = ImGui::GetMousePos();
     mousePos.x -= ImGui::GetWindowPos().x;
@@ -167,7 +172,7 @@ bool Game::animateAndPlaceBitFromTo(Bit *bit, BitHolder*src, BitHolder*dst)
 
 bool Game::gameHasAI()
 {
-    return false;
+    return true;
 }
 
 void Game::updateAI()
